@@ -60,4 +60,458 @@
 </head>
 <body class="bg-sake-bg text-sake-dark min-h-screen pb-24">
 
-    <!--
+    <!-- 頂部導航列 -->
+    <header class="sticky top-0 z-40 bg-sake-bg/90 backdrop-blur-md border-b border-[#EAE3D2] px-4 py-3 flex justify-between items-center">
+        <div>
+            <h1 class="text-lg font-serif font-semibold tracking-wider">清酒手帖</h1>
+            <p class="text-xs text-sake-muted">Sake Tasting Journal</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="openSettingsModal()" class="w-9 h-9 rounded-full bg-sake-card flex items-center justify-center text-sake-dark hover:bg-[#E5DFD3] transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="max-w-md mx-auto px-4 pt-4">
+        
+        <!-- 搜尋與篩選區 -->
+        <div class="mb-5 space-y-3">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-sake-muted">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" id="searchInput" oninput="filterSakes()" placeholder="搜尋酒名、酒造、地點或筆記..." 
+                    class="w-full pl-10 pr-4 py-2.5 bg-sake-card border border-[#EAE3D2] rounded-2xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta placeholder-sake-muted/70">
+            </div>
+
+            <!-- 分類標籤篩選 -->
+            <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-1 text-xs" id="categoryFilters">
+                <button onclick="setCategoryFilter('all')" class="category-btn px-3.5 py-1.5 rounded-full bg-sake-dark text-white font-medium whitespace-nowrap transition">全部</button>
+                <button onclick="setCategoryFilter('純米大吟釀')" class="category-btn px-3.5 py-1.5 rounded-full bg-sake-card text-sake-muted whitespace-nowrap transition">純米大吟釀</button>
+                <button onclick="setCategoryFilter('純米吟釀')" class="category-btn px-3.5 py-1.5 rounded-full bg-sake-card text-sake-muted whitespace-nowrap transition">純米吟釀</button>
+                <button onclick="setCategoryFilter('特別純米')" class="category-btn px-3.5 py-1.5 rounded-full bg-sake-card text-sake-muted whitespace-nowrap transition">特別純米</button>
+                <button onclick="setCategoryFilter('生酒')" class="category-btn px-3.5 py-1.5 rounded-full bg-sake-card text-sake-muted whitespace-nowrap transition">生酒</button>
+            </div>
+        </div>
+
+        <!-- 清單卡片區 -->
+        <div id="sakeList" class="space-y-4">
+            <!-- 動態渲染清單 -->
+        </div>
+
+        <!-- 查無資料提示 -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <p class="text-sake-muted text-sm">目前沒有找到符合的清酒紀錄</p>
+        </div>
+    </main>
+
+    <!-- 底部懸浮拍照按鈕 (FAB) -->
+    <div class="fixed bottom-6 left-0 right-0 flex justify-center z-30 pointer-events-none">
+        <button onclick="openAddModal()" class="pointer-events-auto bg-sake-dark text-sake-bg hover:bg-black px-6 py-3.5 rounded-full shadow-lg flex items-center space-x-2 transition transform active:scale-95">
+            <svg class="w-5 h-5 text-sake-terracotta" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="font-medium text-sm tracking-wide">拍照記錄清酒</span>
+        </button>
+    </div>
+
+    <!-- 新增/辨識 Modal -->
+    <div id="addModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-sake-bg w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            
+            <!-- Modal 標題 -->
+            <div class="px-6 py-4 border-b border-[#EAE3D2] flex justify-between items-center sticky top-0 bg-sake-bg z-10">
+                <h3 class="font-serif font-semibold text-base">新增清酒記錄</h3>
+                <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-sake-card flex items-center justify-center text-sake-muted hover:text-sake-dark">✕</button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                
+                <!-- 4:3 直式拍照/上傳區 -->
+                <div>
+                    <label class="block text-xs font-medium text-sake-muted mb-2">酒標照片 (4:3 比例)</label>
+                    <div id="photoDropZone" onclick="triggerFileInput()" class="relative w-full aspect-3-4 bg-sake-card border-2 border-dashed border-[#D5CEC0] rounded-2xl overflow-hidden flex flex-col items-center justify-center cursor-pointer hover:border-sake-terracotta transition">
+                        <input type="file" id="imageInput" accept="image/*" capture="environment" class="hidden" onchange="handleImageSelected(event)">
+                        <div id="photoPlaceholder" class="text-center p-4">
+                            <svg class="w-10 h-10 mx-auto text-sake-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <p class="text-xs font-medium text-sake-dark">點擊拍照或上傳酒標</p>
+                            <p class="text-[10px] text-sake-muted mt-1">AI 自動辨識酒名、酒造、酒度、精米、濃度</p>
+                        </div>
+                        <img id="previewImage" class="hidden absolute inset-0 w-full h-full object-cover">
+                        <!-- AI 掃描動畫覆蓋層 -->
+                        <div id="scanningOverlay" class="hidden absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
+                            <div class="scanning-line"></div>
+                            <div class="bg-black/60 px-4 py-2 rounded-full backdrop-blur-md flex items-center space-x-2">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span class="text-xs font-medium">AI 辨識與網路數據抓取中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 辨識結果表單 (自動填入) -->
+                <div class="space-y-3.5 bg-sake-card/50 p-4 rounded-2xl border border-[#EAE3D2]">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-sake-dark flex items-center space-x-1">
+                            <span>✨ AI 辨識與抓取結果</span>
+                        </span>
+                        <button type="button" onclick="loadSampleData()" class="text-[11px] text-sake-terracotta underline hover:text-black">載入測試範例</button>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] text-sake-muted mb-1">酒名 (Name)</label>
+                        <input type="text" id="sakeName" placeholder="例如：十四代 純米大吟釀 龍泉" class="w-full px-3 py-2 bg-sake-bg border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-sake-muted mb-1">酒造 (Brewery)</label>
+                            <input type="text" id="sakeBrewery" placeholder="例如：高木酒造" class="w-full px-3 py-2 bg-sake-bg border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-sake-muted mb-1">分類 (Category)</label>
+                            <select id="sakeCategory" class="w-full px-3 py-2 bg-sake-bg border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                                <option value="純米大吟釀">純米大吟釀</option>
+                                <option value="純米吟釀">純米吟釀</option>
+                                <option value="特別純米">特別純米</option>
+                                <option value="純米酒">純米酒</option>
+                                <option value="生酒">生酒</option>
+                                <option value="本釀造">本釀造</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-sake-muted mb-1">酒度 (SMV)</label>
+                            <input type="text" id="sakeSmv" placeholder="+3" class="w-full px-2.5 py-1.5 bg-sake-bg border border-[#EAE3D2] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-sake-muted mb-1">精米 (Polishing)</label>
+                            <input type="text" id="sakePolish" placeholder="50%" class="w-full px-2.5 py-1.5 bg-sake-bg border border-[#EAE3D2] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-sake-muted mb-1">濃度 (ABV)</label>
+                            <input type="text" id="sakeAbv" placeholder="16%" class="w-full px-2.5 py-1.5 bg-sake-bg border border-[#EAE3D2] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 品飲心得與評分 -->
+                <div class="space-y-3.5">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-sake-muted mb-1">喝到的地方 (Location)</label>
+                            <input type="text" id="sakeLocation" placeholder="例如：在家小酌 / 居酒屋百藥" class="w-full px-3 py-2 bg-sake-card border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-sake-muted mb-1">評分 (Rating)</label>
+                            <select id="sakeRating" class="w-full px-3 py-2 bg-sake-card border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                                <option value="5">⭐⭐⭐⭐⭐ (極品)</option>
+                                <option value="4">⭐⭐⭐⭐ (優秀)</option>
+                                <option value="3">⭐⭐⭐ (順口)</option>
+                                <option value="2">⭐⭐ (普通)</option>
+                                <option value="1">⭐ (不合口味)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] text-sake-muted mb-1">個人評論 (Notes)</label>
+                        <textarea id="sakeNotes" rows="2" placeholder="香氣、口感、甘口或辛口感想..." class="w-full px-3 py-2 bg-sake-card border border-[#EAE3D2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-sake-terracotta resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 儲存按鈕 -->
+                <button onclick="saveSake()" class="w-full py-3 bg-sake-dark text-sake-bg rounded-2xl font-medium text-sm hover:bg-black transition shadow-md">儲存記錄</button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定與備份 Modal -->
+    <div id="settingsModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-sake-bg w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-[#EAE3D2] pb-3">
+                <h3 class="font-serif font-semibold text-base">資料與設定</h3>
+                <button onclick="closeSettingsModal()" class="w-7 h-7 rounded-full bg-sake-card flex items-center justify-center text-sake-muted hover:text-sake-dark">✕</button>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs text-sake-muted mb-1">Gemini API 金鑰 (選填，用於進階 Vision 識別)</label>
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full px-3 py-2 bg-sake-card border border-[#EAE3D2] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-sake-terracotta">
+                </div>
+                <button onclick="exportData()" class="w-full py-2.5 bg-sake-card hover:bg-[#E5DFD3] rounded-xl font-medium text-xs transition border border-[#EAE3D2]">匯出備份 JSON</button>
+                <button onclick="triggerImport()" class="w-full py-2.5 bg-sake-card hover:bg-[#E5DFD3] rounded-xl font-medium text-xs transition border border-[#EAE3D2]">匯入備份資料</button>
+                <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
+    <script>
+        let sakes = JSON.parse(localStorage.getItem('sake_journal_data')) || [
+            {
+                id: 1,
+                name: '獺祭 磨之先驅',
+                brewery: '旭酒造',
+                category: '純米大吟釀',
+                smv: '+4',
+                polish: '23%',
+                abv: '15%',
+                location: '在家小酌',
+                rating: '5',
+                notes: '極致的清澈與華麗果香，尾韻細緻悠長。',
+                image: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=600&q=80',
+                date: '2026-11-05'
+            },
+            {
+                id: 2,
+                name: '風之森 Alpha Type 1',
+                brewery: '油長酒造',
+                category: '生酒',
+                smv: '-1',
+                polish: '65%',
+                abv: '14%',
+                location: '居酒屋',
+                rating: '4',
+                notes: '微碳酸口感，新鮮蘋果般的酸甜滋味。',
+                image: 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=600&q=80',
+                date: '2026-10-28'
+            }
+        ];
+
+        let currentCategoryFilter = 'all';
+        let currentImageBase64 = '';
+
+        function renderSakes(dataToRender = sakes) {
+            const container = document.getElementById('sakeList');
+            const emptyState = document.getElementById('emptyState');
+            container.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            dataToRender.forEach(sake => {
+                const stars = '⭐'.repeat(Number(sake.rating) || 5);
+                const card = document.createElement('div');
+                card.className = 'bg-sake-card rounded-3xl overflow-hidden border border-[#EAE3D2] shadow-sm flex flex-col sm:flex-row';
+                card.innerHTML = `
+                    <div class="sm:w-36 aspect-3-4 sm:aspect-auto bg-[#E5DFD3] relative overflow-hidden flex-shrink-0">
+                        <img src="${sake.image || 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=600&q=80'}" class="w-full h-full object-cover" alt="${sake.name}">
+                        <span class="absolute top-2 left-2 px-2 py-0.5 bg-black/50 backdrop-blur-md text-white text-[10px] rounded-full">${sake.category}</span>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-[10px] text-sake-muted uppercase tracking-wider">${sake.brewery}</span>
+                                    <h4 class="font-serif font-semibold text-base text-sake-dark mt-0.5">${sake.name}</h4>
+                                </div>
+                                <span class="text-xs">${stars}</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5 mt-2.5">
+                                ${sake.smv ? `<span class="px-2 py-0.5 bg-sake-bg rounded-md text-[10px] text-sake-muted border border-[#EAE3D2]">酒度: ${sake.smv}</span>` : ''}
+                                ${sake.polish ? `<span class="px-2 py-0.5 bg-sake-bg rounded-md text-[10px] text-sake-muted border border-[#EAE3D2]">精米: ${sake.polish}</span>` : ''}
+                                ${sake.abv ? `<span class="px-2 py-0.5 bg-sake-bg rounded-md text-[10px] text-sake-muted border border-[#EAE3D2]">濃度: ${sake.abv}</span>` : ''}
+                            </div>
+                            <p class="text-xs text-sake-dark/80 mt-2.5 line-clamp-2">${sake.notes || '無筆記'}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-3 pt-3 border-t border-[#EAE3D2]/60 text-[11px] text-sake-muted">
+                            <span>📍 ${sake.location || '未記錄地點'}</span>
+                            <div class="flex space-x-3">
+                                <span>${sake.date}</span>
+                                <button onclick="deleteSake(${sake.id})" class="text-red-500/80 hover:text-red-600">刪除</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterSakes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = sakes.filter(sake => 
+                sake.name.toLowerCase().includes(query) ||
+                sake.brewery.toLowerCase().includes(query) ||
+                (sake.location && sake.location.toLowerCase().includes(query)) ||
+                (sake.notes && sake.notes.toLowerCase().includes(query))
+            );
+
+            if (currentCategoryFilter !== 'all') {
+                filtered = filtered.filter(sake => sake.category === currentCategoryFilter);
+            }
+            renderSakes(filtered);
+        }
+
+        function setCategoryFilter(category) {
+            currentCategoryFilter = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.textContent === category || (category === 'all' && btn.textContent === '全部')) {
+                    btn.className = 'category-btn px-3.5 py-1.5 rounded-full bg-sake-dark text-white font-medium whitespace-nowrap transition';
+                } else {
+                    btn.className = 'category-btn px-3.5 py-1.5 rounded-full bg-sake-card text-sake-muted whitespace-nowrap transition';
+                }
+            });
+            filterSakes();
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            resetForm();
+        }
+
+        function triggerFileInput() {
+            document.getElementById('imageInput').click();
+        }
+
+        function handleImageSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result;
+                const preview = document.getElementById('previewImage');
+                preview.src = currentImageBase64;
+                preview.classList.remove('hidden');
+                document.getElementById('photoPlaceholder').classList.add('hidden');
+
+                // 模擬 AI 辨識與網路資料抓取
+                simulateAILookup();
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function simulateAILookup() {
+            const overlay = document.getElementById('scanningOverlay');
+            overlay.classList.remove('hidden');
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                // 自動帶入辨識與網路抓取的五維度數據
+                document.getElementById('sakeName').value = '鍋島 特別純米酒';
+                document.getElementById('sakeBrewery').value = '富久千代酒造';
+                document.getElementById('sakeCategory').value = '特別純米';
+                document.getElementById('sakeSmv').value = '+2';
+                document.getElementById('sakePolish').value = '55%';
+                document.getElementById('sakeAbv').value = '15%';
+            }, 1800);
+        }
+
+        function loadSampleData() {
+            document.getElementById('sakeName').value = '十四代 龍之落子 純米大吟釀';
+            document.getElementById('sakeBrewery').value = '高木酒造';
+            document.getElementById('sakeCategory').value = '純米大吟釀';
+            document.getElementById('sakeSmv').value = '+1';
+            document.getElementById('sakePolish').value = '40%';
+            document.getElementById('sakeAbv').value = '16%';
+            document.getElementById('sakeLocation').value = '自宅品飲';
+            document.getElementById('sakeRating').value = '5';
+            document.getElementById('sakeNotes').value = '香氣奔放，哈密瓜與水梨的甘甜，口感圓潤極佳。';
+            currentImageBase64 = 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=600&q=80';
+            const preview = document.getElementById('previewImage');
+            preview.src = currentImageBase64;
+            preview.classList.remove('hidden');
+            document.getElementById('photoPlaceholder').classList.add('hidden');
+        }
+
+        function saveSake() {
+            const name = document.getElementById('sakeName').value.trim();
+            if (!name) {
+                alert('請輸入或辨識酒名');
+                return;
+            }
+
+            const newSake = {
+                id: Date.now(),
+                name: name,
+                brewery: document.getElementById('sakeBrewery').value.trim() || '不明酒造',
+                category: document.getElementById('sakeCategory').value,
+                smv: document.getElementById('sakeSmv').value.trim(),
+                polish: document.getElementById('sakePolish').value.trim(),
+                abv: document.getElementById('sakeAbv').value.trim(),
+                location: document.getElementById('sakeLocation').value.trim(),
+                rating: document.getElementById('sakeRating').value,
+                notes: document.getElementById('sakeNotes').value.trim(),
+                image: currentImageBase64 || 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=600&q=80',
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            sakes.unshift(newSake);
+            localStorage.setItem('sake_journal_data', JSON.stringify(sakes));
+            renderSakes();
+            closeAddModal();
+        }
+
+        function deleteSake(id) {
+            if (confirm('確定要刪除這筆清酒記錄嗎？')) {
+                sakes = sakes.filter(s => s.id !== id);
+                localStorage.setItem('sake_journal_data', JSON.stringify(sakes));
+                renderSakes();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('sakeName').value = '';
+            document.getElementById('sakeBrewery').value = '';
+            document.getElementById('sakeSmv').value = '';
+            document.getElementById('sakePolish').value = '';
+            document.getElementById('sakeAbv').value = '';
+            document.getElementById('sakeLocation').value = '';
+            document.getElementById('sakeNotes').value = '';
+            document.getElementById('previewImage').classList.add('hidden');
+            document.getElementById('photoPlaceholder').classList.remove('hidden');
+            currentImageBase64 = '';
+        }
+
+        function openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sakes));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "sake_journal_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerImport() { document.getElementById('importFile').click(); }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        sakes = imported;
+                        localStorage.setItem('sake_journal_data', JSON.stringify(sakes));
+                        renderSakes();
+                        closeSettingsModal();
+                        alert('匯入成功！');
+                    }
+                } catch (err) {
+                    alert('檔案格式錯誤');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 初始化渲染
+        renderSakes();
+    </script>
+</body>
+</html>
